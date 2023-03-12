@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  e-wallet-db:
+    image: postgres:latest
+    container_name: e-wallet-db
+    environment:
+      POSTGRES_DB: "wallet"
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+    ports:
+      - "5432:5432"
+  e-wallet-api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    container_name: e-wallet-api
+    environment:
+      DB_URL: "jdbc:postgresql://e-wallet-db:5432/wallet"
+      DB_USER: "root"
+      DB_PASS: "root"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - e-wallet-db
+
+networks:
+  web:
+    name: web
