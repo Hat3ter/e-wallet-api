@@ -101,7 +101,7 @@ public class WalletServiceImplTest {
 
         UUID walletId = UUID.randomUUID();
         BigDecimal balance = BigDecimal.valueOf(100);
-        when(walletRepository.getBalanceByWalletId(walletId)).thenReturn(balance);
+        when(walletRepository.getBalanceById(walletId)).thenReturn(balance);
 
         BigDecimal result = walletService.getBalance(walletId);
 

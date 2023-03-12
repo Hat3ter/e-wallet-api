@@ -8,7 +8,7 @@ import com.kuehne.nagel.ewalletapi.models.requests.TransferMoneyRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashInRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashOutRequest;
 import com.kuehne.nagel.ewalletapi.repositories.WalletRepository;
-import com.kuehne.nagel.ewalletapi.utils.WalletConverter;
+import com.kuehne.nagel.ewalletapi.utils.WalletMapper;
 import com.kuehne.nagel.ewalletapi.utils.WalletOperationUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +31,14 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletDto getWalletById(UUID walletId) {
 
-        return WalletConverter.convertToWalletDto(getWalletByIdOrThrowException(walletId));
+        return WalletMapper.INSTANCE.convert(getWalletByIdOrThrowException(walletId));
     }
 
     @Override
     public List<WalletDto> getWalletsByUser() {
 
         return walletRepository.findAll().stream()
-                .map(WalletConverter::convertToWalletDto)
+                .map(WalletMapper.INSTANCE::convert)
                 .toList();
     }
 
@@ -46,17 +46,16 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletDto createWallet(CreateWalletRequest walletRequest) {
 
-        Wallet wallet = WalletConverter.convertToWallet(walletRequest);
+        Wallet wallet = WalletMapper.INSTANCE.convert(walletRequest);
+        Wallet savedWallet = walletRepository.save(wallet);
 
-        wallet = walletRepository.save(wallet);
-
-        return WalletConverter.convertToWalletDto(wallet);
+        return WalletMapper.INSTANCE.convert(savedWallet);
     }
 
     @Override
     public BigDecimal getBalance(UUID walletId) {
 
-        return walletRepository.getBalanceByWalletId(walletId);
+        return walletRepository.getBalanceById(walletId);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class WalletServiceImpl implements WalletService {
         Wallet wallet = getWalletByIdOrThrowException(walletId);
         wallet.setBalance(wallet.getBalance().add(cashInRequest.getAmount()));
 
-        return WalletConverter.convertToWalletDto(walletRepository.save(wallet));
+        return WalletMapper.INSTANCE.convert(walletRepository.save(wallet));
     }
 
     @Override
@@ -75,7 +74,7 @@ public class WalletServiceImpl implements WalletService {
         BigDecimal balance = WalletOperationUtil.getPotentialCashOutBalance(wallet, cashOutRequest.getAmount());
         wallet.setBalance(balance);
 
-        return WalletConverter.convertToWalletDto(walletRepository.save(wallet));
+        return WalletMapper.INSTANCE.convert(walletRepository.save(wallet));
     }
 
     @Override

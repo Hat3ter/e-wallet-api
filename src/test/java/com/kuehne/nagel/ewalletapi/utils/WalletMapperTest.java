@@ -4,43 +4,48 @@ import com.kuehne.nagel.ewalletapi.models.dtos.WalletDto;
 import com.kuehne.nagel.ewalletapi.models.entities.Wallet;
 import com.kuehne.nagel.ewalletapi.models.requests.CreateWalletRequest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class WalletConverterTest {
+@ExtendWith(MockitoExtension.class)
+public class WalletMapperTest {
 
     @Test
-    public void convertToWallet_shouldReturnValidWallet() {
+    public void testConvertCreateWalletRequestToWallet() {
 
         CreateWalletRequest request = new CreateWalletRequest();
-        request.setWalletName("Test Wallet");
-        request.setCurrencyType("USD");
+        request.setWalletName("request");
+        request.setCurrencyType("usd");
 
-        Wallet wallet = WalletConverter.convertToWallet(request);
+        Wallet wallet = WalletMapper.INSTANCE.convert(request);
 
-        assertEquals("Test Wallet", wallet.getName());
+        assertEquals(request.getWalletName(), wallet.getName());
+        assertEquals(request.getCurrencyType(), wallet.getCurrencyType());
         assertEquals(BigDecimal.ZERO, wallet.getBalance());
-        assertEquals("USD", wallet.getCurrencyType());
+        assertNull(wallet.getId());
     }
 
     @Test
-    public void convertToWalletDto_shouldConvertWalletToWalletDto() {
+    public void testConvertWalletTOWalletDto() {
 
         Wallet wallet = new Wallet();
         wallet.setId(UUID.randomUUID());
-        wallet.setName("My wallet");
-        wallet.setBalance(new BigDecimal("100.00"));
+        wallet.setName("Wallet");
+        wallet.setBalance(BigDecimal.TEN);
         wallet.setCurrencyType("USD");
 
-        WalletDto walletDto = WalletConverter.convertToWalletDto(wallet);
+        WalletDto walletDto = WalletMapper.INSTANCE.convert(wallet);
 
         assertEquals(wallet.getId(), walletDto.getId());
         assertEquals(wallet.getName(), walletDto.getName());
         assertEquals(wallet.getCurrencyType(), walletDto.getCurrencyType());
         assertEquals(wallet.getBalance(), walletDto.getBalance());
+
 
     }
 }
