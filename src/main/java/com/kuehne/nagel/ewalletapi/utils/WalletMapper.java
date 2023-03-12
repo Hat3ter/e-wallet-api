@@ -8,8 +8,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-import java.math.BigDecimal;
-
 @Mapper(componentModel = "spring")
 public interface WalletMapper {
 
